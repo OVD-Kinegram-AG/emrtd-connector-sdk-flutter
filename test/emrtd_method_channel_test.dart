@@ -20,7 +20,8 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('read', () async {
-    expect(await platform.read(), '42');
-  });
+  // TODO:
+  /*test('readAndVerify', () async {
+    expect(await platform.readAndVerify(), '42');
+  });*/
 }

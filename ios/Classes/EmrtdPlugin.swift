@@ -10,7 +10,7 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
-    case "read":
+    case "readAndVerify":
       result("TODO")
     default:
       result(FlutterMethodNotImplemented)

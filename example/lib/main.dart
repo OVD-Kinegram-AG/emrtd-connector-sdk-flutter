@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initPlatformState() async {
-    final result = await _emrtdPlugin.read(
+    final result = await _emrtdPlugin.readAndVerify(
       clientId: 'your-client-id',
       validationUri: 'https://example.com/validate',
       validationId: 'abc123',

@@ -69,12 +69,12 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         result: Result
     ) {
         when (call.method) {
-            "read" -> onRead(call, result)
+            "readAndVerify" -> onReadAndVerify(call, result)
             else -> result.notImplemented()
         }
     }
 
-    private fun onRead(call: MethodCall, result: Result) {
+    private fun onReadAndVerify(call: MethodCall, result: Result) {
         if (activity == null) {
             result.error(
                 "NO_ACTIVITY",

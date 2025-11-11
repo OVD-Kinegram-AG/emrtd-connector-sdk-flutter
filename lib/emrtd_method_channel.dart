@@ -8,7 +8,7 @@ class MethodChannelEmrtd extends EmrtdPlatform {
   final methodChannel = const MethodChannel('emrtd');
 
   @override
-  Future<String?> read({
+  Future<String?> readAndVerify({
     required String clientId,
     required String validationUri,
     required String validationId,
@@ -16,7 +16,7 @@ class MethodChannelEmrtd extends EmrtdPlatform {
     required String dateOfBirth,
     required String dateOfExpiry,
   }) async {
-    final result = await methodChannel.invokeMethod<String>('read', {
+    final result = await methodChannel.invokeMethod<String>('readAndVerify', {
       'clientId': clientId,
       'validationUri': validationUri,
       'validationId': validationId,

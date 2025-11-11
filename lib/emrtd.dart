@@ -1,7 +1,7 @@
 import 'emrtd_platform_interface.dart';
 
 class Emrtd {
-  Future<String?> read({
+  Future<String?> readAndVerify({
     required String clientId,
     required String validationUri,
     required String validationId,
@@ -9,7 +9,7 @@ class Emrtd {
     required String dateOfBirth,
     required String dateOfExpiry,
   }) {
-    return EmrtdPlatform.instance.read(
+    return EmrtdPlatform.instance.readAndVerify(
       clientId: clientId,
       validationUri: validationUri,
       validationId: validationId,

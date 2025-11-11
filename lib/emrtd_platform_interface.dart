@@ -16,8 +16,7 @@ abstract class EmrtdPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  // Public API that every platform must implement
-  Future<String?> read({
+  Future<String?> readAndVerify({
     required String clientId,
     required String validationUri,
     required String validationId,
@@ -25,6 +24,6 @@ abstract class EmrtdPlatform extends PlatformInterface {
     required String dateOfBirth,
     required String dateOfExpiry,
   }) {
-    throw UnimplementedError('read() has not been implemented.');
+    throw UnimplementedError('readAndVerify() has not been implemented.');
   }
 }
