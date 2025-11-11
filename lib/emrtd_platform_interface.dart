@@ -26,4 +26,15 @@ abstract class EmrtdPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('readAndVerify() has not been implemented.');
   }
+
+  Future<String?> readAndVerifyWithCan({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) {
+    throw UnimplementedError(
+      'readAndVerifyWithCan() has not been implemented.',
+    );
+  }
 }

@@ -1,28 +1,75 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:emrtd/emrtd.dart';
-import 'package:emrtd/emrtd_platform_interface.dart';
 import 'package:emrtd/emrtd_method_channel.dart';
+import 'package:emrtd/emrtd_platform_interface.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockEmrtdPlatform
     with MockPlatformInterfaceMixin
     implements EmrtdPlatform {
   @override
-  Future<String?> read() => Future.value('42');
+  Future<String?> readAndVerify({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String documentNumber,
+    required String dateOfBirth,
+    required String dateOfExpiry,
+  }) async {
+    return 'mrz-result';
+  }
+
+  @override
+  Future<String?> readAndVerifyWithCan({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) async {
+    return 'can-result';
+  }
 }
 
 void main() {
   final EmrtdPlatform initialPlatform = EmrtdPlatform.instance;
 
+  tearDown(() {
+    EmrtdPlatform.instance = initialPlatform;
+  });
+
   test('$MethodChannelEmrtd is the default instance', () {
     expect(initialPlatform, isInstanceOf<MethodChannelEmrtd>());
   });
 
-  test('read', () async {
-    Emrtd emrtdPlugin = Emrtd();
-    MockEmrtdPlatform fakePlatform = MockEmrtdPlatform();
+  test('readAndVerify delegates to platform implementation', () async {
+    final emrtdPlugin = Emrtd();
+    final fakePlatform = MockEmrtdPlatform();
     EmrtdPlatform.instance = fakePlatform;
 
-    expect(await emrtdPlugin.read(), '42');
+    final result = await emrtdPlugin.readAndVerify(
+      clientId: 'client',
+      validationUri: 'uri',
+      validationId: 'validation',
+      documentNumber: 'DOC123',
+      dateOfBirth: '1990-01-01',
+      dateOfExpiry: '2030-01-01',
+    );
+
+    expect(result, 'mrz-result');
+  });
+
+  test('readAndVerifyWithCan delegates to platform implementation', () async {
+    final emrtdPlugin = Emrtd();
+    final fakePlatform = MockEmrtdPlatform();
+    EmrtdPlatform.instance = fakePlatform;
+
+    final result = await emrtdPlugin.readAndVerifyWithCan(
+      clientId: 'client',
+      validationUri: 'uri',
+      validationId: 'validation',
+      can: '123456',
+    );
+
+    expect(result, 'can-result');
   });
 }

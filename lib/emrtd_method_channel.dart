@@ -26,4 +26,21 @@ class MethodChannelEmrtd extends EmrtdPlatform {
     });
     return result;
   }
+
+  @override
+  Future<String?> readAndVerifyWithCan({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) async {
+    final result = await methodChannel
+        .invokeMethod<String>('readAndVerifyWithCan', {
+          'clientId': clientId,
+          'validationUri': validationUri,
+          'validationId': validationId,
+          'can': can,
+        });
+    return result;
+  }
 }

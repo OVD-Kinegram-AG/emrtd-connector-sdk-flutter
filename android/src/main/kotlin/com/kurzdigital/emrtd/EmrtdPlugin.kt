@@ -70,6 +70,7 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     ) {
         when (call.method) {
             "readAndVerify" -> onReadAndVerify(call, result)
+            "readAndVerifyWithCan" -> onReadAndVerifyWithCan(call, result)
             else -> result.notImplemented()
         }
     }
@@ -125,6 +126,55 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 putExtra(EmrtdConnectorActivity.DOCUMENT_NUMBER_KEY, documentNumber)
                 putExtra(EmrtdConnectorActivity.DATE_OF_BIRTH_KEY, dateOfBirth)
                 putExtra(EmrtdConnectorActivity.DATE_OF_EXPIRY_KEY, dateOfExpiry)
+            },
+            REQUEST_CODE
+        )
+    }
+
+    private fun onReadAndVerifyWithCan(call: MethodCall, result: Result) {
+        if (activity == null) {
+            result.error(
+                "NO_ACTIVITY",
+                "Plugin not attached to an activity",
+                null
+            )
+            return
+        }
+
+        val args = call.arguments as? Map<*, *> ?: run {
+            result.error(
+                "ARGUMENT_ERROR",
+                "Arguments missing or invalid",
+                null
+            )
+            return
+        }
+
+        val clientId = args["clientId"] as? String
+        val validationUri = args["validationUri"] as? String
+        val validationId = args["validationId"] as? String
+        val can = args["can"] as? String
+
+        if (clientId == null ||
+            validationUri == null ||
+            validationId == null ||
+            can == null
+        ) {
+            result.error(
+                "ARGUMENT_MISSING",
+                "One or more required arguments are missing",
+                null
+            )
+            return
+        }
+
+        pendingResult = result
+        activity?.startActivityForResult(
+            Intent(activity, EmrtdConnectorActivity::class.java).apply {
+                putExtra(EmrtdConnectorActivity.CLIENT_ID, clientId)
+                putExtra(EmrtdConnectorActivity.VALIDATION_URI, validationUri)
+                putExtra(EmrtdConnectorActivity.VALIDATION_ID_KEY, validationId)
+                putExtra(EmrtdConnectorActivity.CAN_KEY, can)
             },
             REQUEST_CODE
         )

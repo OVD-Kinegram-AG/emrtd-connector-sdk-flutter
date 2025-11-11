@@ -12,6 +12,8 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
     switch call.method {
     case "readAndVerify":
       result("TODO")
+    case "readAndVerifyWithCan":
+      result("TODO")
     default:
       result(FlutterMethodNotImplemented)
     }

@@ -18,4 +18,18 @@ class Emrtd {
       dateOfExpiry: dateOfExpiry,
     );
   }
+
+  Future<String?> readAndVerifyWithCan({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) {
+    return EmrtdPlatform.instance.readAndVerifyWithCan(
+      clientId: clientId,
+      validationUri: validationUri,
+      validationId: validationId,
+      can: can,
+    );
+  }
 }
