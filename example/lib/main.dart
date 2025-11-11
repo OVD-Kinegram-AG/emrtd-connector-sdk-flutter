@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:emrtd/emrtd.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
           await _emrtdPlugin.readAndVerify(
             clientId: "your-client-id",
             validationUri: "wss://kinegramdocval.lkis.de/ws1/validate",
-            validationId: Uuid().v4(),
+            validationId: _randomId(),
             documentNumber: _documentNumberController.text.trim(),
             dateOfBirth: _dateOfBirthController.text.trim(),
             dateOfExpiry: _dateOfExpiryController.text.trim(),
@@ -72,6 +72,13 @@ class _MyAppState extends State<MyApp> {
         _isLoading = false;
       });
     }
+  }
+
+  String _randomId() {
+    final rand = Random();
+    return List<int>.generate(16, (_) => rand.nextInt(256))
+        .map((b) => b.toRadixString(16).padLeft(2, '0'))
+        .join();
   }
 
   void _setStateWhenMounted(VoidCallback fn) {
