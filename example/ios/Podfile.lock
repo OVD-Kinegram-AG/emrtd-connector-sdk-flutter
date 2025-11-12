@@ -1,0 +1,35 @@
+PODS:
+  - emrtd (0.0.1):
+    - Flutter
+    - KinegramEmrtdConnector (~> 2.1.0)
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - KinegramEmrtdConnector (2.1.2)
+
+DEPENDENCIES:
+  - emrtd (from `.symlinks/plugins/emrtd/ios`)
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+
+SPEC REPOS:
+  trunk:
+    - KinegramEmrtdConnector
+
+EXTERNAL SOURCES:
+  emrtd:
+    :path: ".symlinks/plugins/emrtd/ios"
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+
+SPEC CHECKSUMS:
+  emrtd: 6b378353e2160fe1effc4dc5f31afa33ac2b4488
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  KinegramEmrtdConnector: c4d5a94ec43c9e4ba986ada6a8bf0c534eb70f28
+
+PODFILE CHECKSUM: ce2a4dd764e1c7aeed6a7cdc5e61d092b6dc6d32
+
+COCOAPODS: 1.16.2

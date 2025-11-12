@@ -5,17 +5,19 @@
 Pod::Spec.new do |s|
   s.name             = 'emrtd'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'Kinegram eMRTD Connector'
   s.description      = <<-DESC
-A new Flutter plugin project.
+The Kinegram eMRTD Connector enables your Flutter app to read and verify
+electronic passports / id cards (a.ka. eMRTDs).
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'http://www.kinegram.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'OVD Kinegram AG' => 'digitalsolutions@kinegram.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '13.0'
+  s.dependency 'KinegramEmrtdConnector', '~> 2.1.0'
+  s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
