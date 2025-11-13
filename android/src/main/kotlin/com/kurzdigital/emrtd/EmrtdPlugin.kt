@@ -69,13 +69,31 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         result: Result
     ) {
         when (call.method) {
-            "readAndVerify" -> onReadAndVerify(call, result)
-            "readAndVerifyWithCan" -> onReadAndVerifyWithCan(call, result)
+            "readAndVerify" -> onReadAndVerify(
+                call,
+                result,
+                mapOf(
+                    EmrtdConnectorActivity.DOCUMENT_NUMBER_KEY to "documentNumber",
+                    EmrtdConnectorActivity.DATE_OF_BIRTH_KEY to "dateOfBirth",
+                    EmrtdConnectorActivity.DATE_OF_EXPIRY_KEY to "dateOfExpiry",
+                )
+            )
+
+            "readAndVerifyWithCan" -> onReadAndVerify(
+                call,
+                result,
+                mapOf(EmrtdConnectorActivity.CAN_KEY to "can")
+            )
+
             else -> result.notImplemented()
         }
     }
 
-    private fun onReadAndVerify(call: MethodCall, result: Result) {
+    private fun onReadAndVerify(
+        call: MethodCall,
+        result: Result,
+        arguments: Map<String, String>,
+    ) {
         if (activity == null) {
             result.error(
                 "NO_ACTIVITY",
@@ -85,96 +103,26 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        // Safely extract arguments from Dart call
-        val args = call.arguments as? Map<*, *> ?: run {
-            result.error(
-                "ARGUMENT_ERROR",
-                "Arguments missing or invalid",
-                null
-            )
-            return
-        }
-
-        val clientId = args["clientId"] as? String
-        val validationUri = args["validationUri"] as? String
-        val validationId = args["validationId"] as? String
-        val documentNumber = args["documentNumber"] as? String
-        val dateOfBirth = args["dateOfBirth"] as? String
-        val dateOfExpiry = args["dateOfExpiry"] as? String
-
-        if (clientId == null ||
-            validationUri == null ||
-            validationId == null ||
-            documentNumber == null ||
-            dateOfBirth == null ||
-            dateOfExpiry == null
-        ) {
-            result.error(
-                "ARGUMENT_MISSING",
-                "One or more required arguments are missing",
-                null
-            )
-            return
-        }
-
-        pendingResult = result
-        activity?.startActivityForResult(
-            Intent(activity, EmrtdConnectorActivity::class.java).apply {
-                putExtra(EmrtdConnectorActivity.CLIENT_ID, clientId)
-                putExtra(EmrtdConnectorActivity.VALIDATION_URI, validationUri)
-                putExtra(EmrtdConnectorActivity.VALIDATION_ID_KEY, validationId)
-                putExtra(EmrtdConnectorActivity.DOCUMENT_NUMBER_KEY, documentNumber)
-                putExtra(EmrtdConnectorActivity.DATE_OF_BIRTH_KEY, dateOfBirth)
-                putExtra(EmrtdConnectorActivity.DATE_OF_EXPIRY_KEY, dateOfExpiry)
-            },
-            REQUEST_CODE
+        val allArgs = arguments + mapOf(
+            EmrtdConnectorActivity.CLIENT_ID to "clientId",
+            EmrtdConnectorActivity.VALIDATION_URI to "validationUri",
+            EmrtdConnectorActivity.VALIDATION_ID_KEY to "validationId",
         )
-    }
-
-    private fun onReadAndVerifyWithCan(call: MethodCall, result: Result) {
-        if (activity == null) {
-            result.error(
-                "NO_ACTIVITY",
-                "Plugin not attached to an activity",
-                null
-            )
-            return
-        }
-
-        val args = call.arguments as? Map<*, *> ?: run {
-            result.error(
-                "ARGUMENT_ERROR",
-                "Arguments missing or invalid",
-                null
-            )
-            return
-        }
-
-        val clientId = args["clientId"] as? String
-        val validationUri = args["validationUri"] as? String
-        val validationId = args["validationId"] as? String
-        val can = args["can"] as? String
-
-        if (clientId == null ||
-            validationUri == null ||
-            validationId == null ||
-            can == null
-        ) {
-            result.error(
-                "ARGUMENT_MISSING",
-                "One or more required arguments are missing",
-                null
-            )
-            return
-        }
 
         pendingResult = result
         activity?.startActivityForResult(
             Intent(activity, EmrtdConnectorActivity::class.java).apply {
-                putExtra(EmrtdConnectorActivity.CLIENT_ID, clientId)
-                putExtra(EmrtdConnectorActivity.VALIDATION_URI, validationUri)
-                putExtra(EmrtdConnectorActivity.VALIDATION_ID_KEY, validationId)
-                putExtra(EmrtdConnectorActivity.CAN_KEY, can)
+                allArgs.forEach { (key, name) ->
+                    if (!call.hasArgument(name)) {
+                        result.error(
+                            "ARGUMENT_MISSING",
+                            "$name missing",
+                            null
+                        )
+                        return
+                    }
+                    putExtra(key, call.argument(name) as? String)
+                }
             },
             REQUEST_CODE
         )
