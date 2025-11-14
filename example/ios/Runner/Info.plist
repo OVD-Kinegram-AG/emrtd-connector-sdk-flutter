@@ -47,10 +47,5 @@
 	<true/>
 	<key>NFCReaderUsageDescription</key>
 	<string>This app uses NFC to read secure identity documents.</string>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string>A0000002471001</string>
-		<string>A0000002472001</string>
-	</array>
 </dict>
 </plist>
