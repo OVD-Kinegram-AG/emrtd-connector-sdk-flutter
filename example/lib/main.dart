@@ -30,8 +30,8 @@ class _MyAppState extends State<MyApp> {
   final _mrzFormKey = GlobalKey<FormState>();
   final _canFormKey = GlobalKey<FormState>();
   final _documentNumberController = TextEditingController(text: 'C01X00000');
-  final _dateOfBirthController = TextEditingController(text: '1990-01-01');
-  final _dateOfExpiryController = TextEditingController(text: '2030-01-01');
+  final _dateOfBirthController = TextEditingController(text: '900101');
+  final _dateOfExpiryController = TextEditingController(text: '300101');
   final _canController = TextEditingController(text: '123456');
 
   final _emrtdPlugin = Emrtd();
@@ -202,12 +202,12 @@ class _MyAppState extends State<MyApp> {
                           ),
                           _buildTextField(
                             controller: _dateOfBirthController,
-                            label: 'Date of Birth (YYYY-MM-DD)',
+                            label: 'Date of Birth (YYMMDD)',
                             keyboardType: TextInputType.datetime,
                           ),
                           _buildTextField(
                             controller: _dateOfExpiryController,
-                            label: 'Date of Expiry (YYYY-MM-DD)',
+                            label: 'Date of Expiry (YYMMDD)',
                             keyboardType: TextInputType.datetime,
                           ),
                           const SizedBox(height: 16),
