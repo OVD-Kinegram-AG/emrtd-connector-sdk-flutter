@@ -11,6 +11,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 import com.kinegram.android.emrtdconnector.EmrtdConnectorActivity
+import com.kinegram.android.emrtdconnector.EmrtdPassport
 
 class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     // This local reference serves to register the plugin with the Flutter
@@ -39,7 +40,21 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             if (requestCode == REQUEST_CODE) {
                 pendingResult?.let {
                     if (resultCode == Activity.RESULT_OK) {
-                        it.success(data?.getStringExtra("result"))
+                        val passportData = data?.getParcelableExtra<EmrtdPassport>(
+                            EmrtdConnectorActivity.RETURN_DATA
+                        )
+                        if (passportData == null) {
+                            val error = data?.getStringExtra(
+                                EmrtdConnectorActivity.RETURN_ERROR
+                            )
+                            it.error(
+                                "CANCELLED",
+                                error ?: "Unknown error",
+                                null
+                            )
+                        } else {
+                            it.success(passportData.toJSON().toString())
+                        }
                     } else {
                         it.error("CANCELLED", "User cancelled", null)
                     }
@@ -73,16 +88,16 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 call,
                 result,
                 mapOf(
-                    EmrtdConnectorActivity.DOCUMENT_NUMBER_KEY to "documentNumber",
-                    EmrtdConnectorActivity.DATE_OF_BIRTH_KEY to "dateOfBirth",
-                    EmrtdConnectorActivity.DATE_OF_EXPIRY_KEY to "dateOfExpiry",
+                    EmrtdConnectorActivity.DOCUMENT_NUMBER to "documentNumber",
+                    EmrtdConnectorActivity.DATE_OF_BIRTH to "dateOfBirth",
+                    EmrtdConnectorActivity.DATE_OF_EXPIRY to "dateOfExpiry",
                 )
             )
 
             "readAndVerifyWithCan" -> onReadAndVerify(
                 call,
                 result,
-                mapOf(EmrtdConnectorActivity.CAN_KEY to "can")
+                mapOf(EmrtdConnectorActivity.CAN to "can")
             )
 
             else -> result.notImplemented()
@@ -106,7 +121,7 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val allArgs = arguments + mapOf(
             EmrtdConnectorActivity.CLIENT_ID to "clientId",
             EmrtdConnectorActivity.VALIDATION_URI to "validationUri",
-            EmrtdConnectorActivity.VALIDATION_ID_KEY to "validationId",
+            EmrtdConnectorActivity.VALIDATION_ID to "validationId",
         )
 
         pendingResult = result

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
 
@@ -12,10 +11,6 @@
             android:exported="true"
             android:label="@string/ready_to_scan"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.AppCompat.Translucent">
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.AppCompat.Translucent"/>
     </application>
 </manifest>
