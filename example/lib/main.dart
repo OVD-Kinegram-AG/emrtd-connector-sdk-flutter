@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:emrtd/emrtd.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,6 +20,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final String _clientId = 'example_client';
   final String _validationUri = 'wss://docval.kurzdigital.com/ws2/validate';
+  static const _documentNumberKey = 'document_number';
+  static const _dateOfBirthKey = 'date_of_birth';
+  static const _dateOfExpiryKey = 'date_of_expiry';
+  static const _canKey = 'can';
+  final Future<SharedPreferences> _prefsFuture =
+      SharedPreferences.getInstance();
 
   final _mrzFormKey = GlobalKey<FormState>();
   final _canFormKey = GlobalKey<FormState>();
@@ -34,12 +41,55 @@ class _MyAppState extends State<MyApp> {
   bool _isCanLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _documentNumberController.addListener(
+      () => _persistValue(_documentNumberKey, _documentNumberController.text),
+    );
+    _dateOfBirthController.addListener(
+      () => _persistValue(_dateOfBirthKey, _dateOfBirthController.text),
+    );
+    _dateOfExpiryController.addListener(
+      () => _persistValue(_dateOfExpiryKey, _dateOfExpiryController.text),
+    );
+    _canController.addListener(
+      () => _persistValue(_canKey, _canController.text),
+    );
+    _loadStoredValues();
+  }
+
+  @override
   void dispose() {
     _documentNumberController.dispose();
     _dateOfBirthController.dispose();
     _dateOfExpiryController.dispose();
     _canController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadStoredValues() async {
+    final prefs = await _prefsFuture;
+    final storedDocumentNumber = prefs.getString(_documentNumberKey);
+    final storedDateOfBirth = prefs.getString(_dateOfBirthKey);
+    final storedDateOfExpiry = prefs.getString(_dateOfExpiryKey);
+    final storedCan = prefs.getString(_canKey);
+
+    if (storedDocumentNumber?.isNotEmpty ?? false) {
+      _documentNumberController.text = storedDocumentNumber!;
+    }
+    if (storedDateOfBirth?.isNotEmpty ?? false) {
+      _dateOfBirthController.text = storedDateOfBirth!;
+    }
+    if (storedDateOfExpiry?.isNotEmpty ?? false) {
+      _dateOfExpiryController.text = storedDateOfExpiry!;
+    }
+    if (storedCan?.isNotEmpty ?? false) {
+      _canController.text = storedCan!;
+    }
+  }
+
+  void _persistValue(String key, String value) {
+    _prefsFuture.then((prefs) => prefs.setString(key, value));
   }
 
   Future<void> _readAndVerifyWithMrz() async {

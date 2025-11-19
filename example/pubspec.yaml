@@ -18,6 +18,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  shared_preferences: ^2.3.2
+
   emrtd:
     # When depending on this package from a real application you should use:
     #   emrtd: ^x.y.z
