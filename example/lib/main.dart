@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final String _clientId = 'your-client-id';
+  final String _clientId = 'example_client';
   final String _validationUri = 'wss://docval.kurzdigital.com/ws2/validate';
 
   final _mrzFormKey = GlobalKey<FormState>();
