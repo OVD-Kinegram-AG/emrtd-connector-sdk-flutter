@@ -1,17 +1,41 @@
-# emrtd_example
+# EmrtdPlugin Example
 
-Demonstrates how to use the emrtd plugin.
+This example uses the `emrtd` Flutter plugin to read the chip inside
+electronic travel documents and verify the result with a backend validator.
 
-## Getting Started
+## Quick start
 
-This project is a starting point for a Flutter application.
+1. Add the plugin to your `pubspec.yaml`:
+   ```yaml
+   dependencies:
+     emrtd: ^latest
+   ```
+2. Import and create an instance in your widget:
+   ```dart
+   import 'package:emrtd/emrtd.dart';
 
-A few resources to get you started if this is your first Flutter project:
+   final _emrtd = Emrtd();
+   ```
+3. Read and verify the document using either MRZ values or the CAN:
+   ```dart
+   final result = await _emrtd.readAndVerify(
+     clientId: 'your_client_id',
+     validationUri: 'wss://docval.kurzdigital.com/ws2/validate',
+     validationId: 'unique-session-id',
+     documentNumber: 'C01X00000',
+     dateOfBirth: '900101',
+     dateOfExpiry: '300101',
+   );
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+   // Alternatively, use the CAN (Card Access Number).
+   final resultWithCan = await _emrtd.readAndVerifyWithCan(
+     clientId: 'your_client_id',
+     validationUri: 'wss://docval.kurzdigital.com/ws2/validate',
+     validationId: 'unique-session-id',
+     can: '123456',
+   );
+   ```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The `readAndVerify…` calls initiate an NFC session, read the eMRTD chip with
+the provided credentials, and send the result to the validator referenced by
+`validationUri`.
