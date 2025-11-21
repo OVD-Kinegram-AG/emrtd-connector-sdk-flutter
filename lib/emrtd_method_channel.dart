@@ -34,13 +34,13 @@ class MethodChannelEmrtd extends EmrtdPlatform {
     required String validationId,
     required String can,
   }) async {
-    final result = await methodChannel
-        .invokeMethod<String>('readAndVerifyWithCan', {
-          'clientId': clientId,
-          'validationUri': validationUri,
-          'validationId': validationId,
-          'can': can,
-        });
+    final result =
+        await methodChannel.invokeMethod<String>('readAndVerifyWithCan', {
+      'clientId': clientId,
+      'validationUri': validationUri,
+      'validationId': validationId,
+      'can': can,
+    });
     return result;
   }
 }
