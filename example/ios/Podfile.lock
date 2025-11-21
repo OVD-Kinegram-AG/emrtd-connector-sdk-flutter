@@ -1,20 +1,13 @@
 PODS:
   - emrtd (0.0.1):
     - Flutter
-    - KinegramEmrtdConnector (~> 2.1.0)
+    - KinegramEmrtdConnector (~> 2.9.1)
   - Flutter (1.0.0)
-  - integration_test (0.0.1):
-    - Flutter
-  - KinegramEmrtdConnector (2.1.2)
-  - shared_preferences_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
+  - KinegramEmrtdConnector (2.9.1)
 
 DEPENDENCIES:
   - emrtd (from `.symlinks/plugins/emrtd/ios`)
   - Flutter (from `Flutter`)
-  - integration_test (from `.symlinks/plugins/integration_test/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -25,17 +18,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/emrtd/ios"
   Flutter:
     :path: Flutter
-  integration_test:
-    :path: ".symlinks/plugins/integration_test/ios"
-  shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
-  emrtd: f7943dc668a8c35ccc32790645589fca9552b52e
+  emrtd: 2420c6adae5572631441f69bd3324748823adac2
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  KinegramEmrtdConnector: c4d5a94ec43c9e4ba986ada6a8bf0c534eb70f28
-  shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
+  KinegramEmrtdConnector: 5203617ad1a659a7a013daabdb2c1649d8b0412a
 
 PODFILE CHECKSUM: ce2a4dd764e1c7aeed6a7cdc5e61d092b6dc6d32
 
