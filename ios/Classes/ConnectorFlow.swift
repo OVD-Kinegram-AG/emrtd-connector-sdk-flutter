@@ -1,6 +1,5 @@
 import Foundation
 import KinegramEmrtdConnector
-import UIKit
 
 struct ConnectorConfiguration {
   let clientId: String
@@ -31,7 +30,7 @@ enum ConnectorFlowError: LocalizedError, Equatable {
 }
 
 @MainActor
-final class ConnectorViewController: UIViewController {
+final class ConnectorFlow {
   var onCompletion: ((Result<String, Error>) -> Void)?
 
   private let configuration: ConnectorConfiguration
@@ -41,72 +40,12 @@ final class ConnectorViewController: UIViewController {
   private var validationTask: Task<Void, Never>?
   private var didFinish = false
 
-  private let statusLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.numberOfLines = 0
-    label.textAlignment = .center
-    label.text = "Preparing…"
-    label.font = .preferredFont(forTextStyle: .body)
-    return label
-  }()
-
-  private let activityIndicator: UIActivityIndicatorView = {
-    let indicator = UIActivityIndicatorView(style: .large)
-    indicator.translatesAutoresizingMaskIntoConstraints = false
-    indicator.hidesWhenStopped = false
-    indicator.startAnimating()
-    return indicator
-  }()
-
   init(configuration: ConnectorConfiguration, accessMode: ConnectorAccessMode) {
     self.configuration = configuration
     self.accessMode = accessMode
-    super.init(nibName: nil, bundle: nil)
   }
 
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    view.backgroundColor = .systemBackground
-    navigationItem.title = "eMRTD"
-    navigationItem.largeTitleDisplayMode = .never
-    navigationItem.leftBarButtonItem = UIBarButtonItem(
-      barButtonSystemItem: .close,
-      target: self,
-      action: #selector(cancelFlow)
-    )
-
-    view.addSubview(statusLabel)
-    view.addSubview(activityIndicator)
-
-    NSLayoutConstraint.activate([
-      statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-      statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-      statusLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
-
-      activityIndicator.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 24),
-      activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-    ])
-  }
-
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    startValidationIfNeeded()
-  }
-
-  override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
-    if isMovingFromParent || isBeingDismissed {
-      validationTask?.cancel()
-    }
-  }
-
-  private func startValidationIfNeeded() {
+  func start() {
     guard validationTask == nil else { return }
     validationTask = Task { [weak self] in
       guard let self else { return }
@@ -114,8 +53,17 @@ final class ConnectorViewController: UIViewController {
     }
   }
 
+  func cancel() {
+    guard !didFinish else { return }
+    validationTask?.cancel()
+    Task { [weak self] in
+      guard let self else { return }
+      await self.connector?.disconnect()
+      self.finish(with: .failure(ConnectorFlowError.cancelled))
+    }
+  }
+
   private func runValidationFlow() async {
-    updateStatus("Connecting…")
     let connector = EmrtdConnector(
       serverURL: configuration.serverURL,
       validationId: configuration.validationId,
@@ -194,40 +142,9 @@ final class ConnectorViewController: UIViewController {
   private func finish(with error: Error) {
     finish(with: .failure(error))
   }
-
-  private func updateStatus(_ text: String) {
-    statusLabel.text = text
-  }
-
-  @objc
-  private func cancelFlow() {
-    guard !didFinish else { return }
-    updateStatus("Cancelling…")
-    validationTask?.cancel()
-    Task { [weak self] in
-      await self?.connector?.disconnect()
-      self?.finish(with: .failure(ConnectorFlowError.cancelled))
-    }
-  }
 }
 
-extension ConnectorViewController: EmrtdConnectorDelegate {
-  func connectorDidConnect(_ connector: EmrtdConnector) async {
-    updateStatus("Connected. Hold the document to the top of the phone.")
-  }
-
-  func connectorWillReadChip(_ connector: EmrtdConnector) async {
-    updateStatus("Reading the chip… Keep the document steady.")
-  }
-
-  func connectorDidPerformHandover(_ connector: EmrtdConnector) async {
-    updateStatus("Authenticating with the server…")
-  }
-
-  func connectorWillCompleteReading(_ connector: EmrtdConnector) async {
-    updateStatus("Finalizing…")
-  }
-
+extension ConnectorFlow: EmrtdConnectorDelegate {
   func connectorDidCompleteValidation(_ connector: EmrtdConnector, result: ValidationResult) async {
     do {
       try finish(with: result)
@@ -238,9 +155,5 @@ extension ConnectorViewController: EmrtdConnectorDelegate {
 
   func connector(_ connector: EmrtdConnector, didFailWithError error: Error) async {
     finish(with: error)
-  }
-
-  func connector(_ connector: EmrtdConnector, didUpdateNFCStatus status: NFCProgressStatus) async {
-    updateStatus(status.alertMessage)
   }
 }

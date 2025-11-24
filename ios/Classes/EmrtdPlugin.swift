@@ -1,10 +1,9 @@
 import Flutter
-import UIKit
 
 @MainActor
 public class EmrtdPlugin: NSObject, FlutterPlugin {
   private var pendingResult: FlutterResult?
-  private weak var presentedController: UIViewController?
+  private var connectorFlow: ConnectorFlow?
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "emrtd", binaryMessenger: registrar.messenger())
@@ -94,70 +93,31 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
       return
     }
 
-    guard let presenter = topViewController() else {
-      result(FlutterError(code: "NO_VIEW_CONTROLLER", message: "Unable to find a presenter view controller", details: nil))
-      return
-    }
-
-    let connectorController = ConnectorViewController(configuration: configuration, accessMode: accessMode)
-    connectorController.onCompletion = { [weak self] controllerResult in
+    let flow = ConnectorFlow(configuration: configuration, accessMode: accessMode)
+    flow.onCompletion = { [weak self] controllerResult in
       self?.handleConnectorCompletion(controllerResult)
     }
 
-    let navigationController = UINavigationController(rootViewController: connectorController)
-    navigationController.modalPresentationStyle = .fullScreen
-    navigationController.isModalInPresentation = true
-
     pendingResult = result
-    presentedController = navigationController
-    presenter.present(navigationController, animated: true)
+    connectorFlow = flow
+    flow.start()
   }
 
   private func handleConnectorCompletion(_ controllerResult: Result<String, Error>) {
     guard let flutterResult = pendingResult else { return }
 
-    let sendResult = {
-      switch controllerResult {
-      case .success(let payload):
-        flutterResult(payload)
-      case .failure(let error):
-        if let flowError = error as? ConnectorFlowError, flowError == .cancelled {
-          flutterResult(FlutterError(code: "CANCELLED", message: flowError.localizedDescription, details: nil))
-        } else {
-          flutterResult(FlutterError(code: "IOS_ERROR", message: error.localizedDescription, details: nil))
-        }
+    switch controllerResult {
+    case .success(let payload):
+      flutterResult(payload)
+    case .failure(let error):
+      if let flowError = error as? ConnectorFlowError, flowError == .cancelled {
+        flutterResult(FlutterError(code: "CANCELLED", message: flowError.localizedDescription, details: nil))
+      } else {
+        flutterResult(FlutterError(code: "IOS_ERROR", message: error.localizedDescription, details: nil))
       }
     }
 
-    let cleanup = {
-      self.pendingResult = nil
-      self.presentedController = nil
-    }
-
-    if let controller = presentedController {
-      controller.dismiss(animated: true) {
-        sendResult()
-        cleanup()
-      }
-    } else {
-      sendResult()
-      cleanup()
-    }
-  }
-
-  private func topViewController(base: UIViewController? = UIApplication.shared.connectedScenes
-    .compactMap { $0 as? UIWindowScene }
-    .flatMap { $0.windows }
-    .first(where: { $0.isKeyWindow })?.rootViewController) -> UIViewController? {
-    if let nav = base as? UINavigationController {
-      return topViewController(base: nav.visibleViewController)
-    }
-    if let tab = base as? UITabBarController {
-      return topViewController(base: tab.selectedViewController)
-    }
-    if let presented = base?.presentedViewController {
-      return topViewController(base: presented)
-    }
-    return base
+    pendingResult = nil
+    connectorFlow = nil
   }
 }
