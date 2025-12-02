@@ -49,7 +49,7 @@ android {
 
     dependencies {
         implementation 'androidx.appcompat:appcompat:1.6.1'
-        implementation 'com.kinegram.android:emrtdconnector:2.1.20'
+        implementation 'com.kinegram.android:emrtdconnector:2.1.21'
 
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")
