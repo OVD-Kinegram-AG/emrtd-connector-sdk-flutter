@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.5
+* Update eMRTD connector
+
 ## 0.0.4
 * Update eMRTD connector
 
