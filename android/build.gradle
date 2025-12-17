@@ -48,7 +48,7 @@ android {
 
     dependencies {
         implementation 'androidx.appcompat:appcompat:1.6.1'
-        implementation 'com.kinegram.android:emrtdconnector:2.1.21'
+        implementation 'com.kinegram.android:emrtdconnector:2.1.22'
     }
 
     packagingOptions {
