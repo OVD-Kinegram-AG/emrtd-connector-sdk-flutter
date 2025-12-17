@@ -87,4 +87,23 @@ void main() {
       'issuingCountry': 'D',
     });
   });
+
+  test('readAndVerifyWithPacePolling uses the method channel', () async {
+    final result = await platform.readAndVerifyWithPacePolling(
+      clientId: 'client',
+      validationUri: 'uri',
+      validationId: 'id',
+      can: '123456',
+    );
+
+    expect(result, 'mock-result');
+    expect(log, hasLength(1));
+    expect(log.single.method, 'readAndVerifyWithPacePolling');
+    expect(log.single.arguments, {
+      'clientId': 'client',
+      'validationUri': 'uri',
+      'validationId': 'id',
+      'can': '123456',
+    });
+  });
 }

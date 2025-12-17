@@ -50,4 +50,18 @@ class Emrtd {
       issuingCountry: issuingCountry,
     );
   }
+
+  Future<String?> readAndVerifyWithPacePolling({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) {
+    return EmrtdPlatform.instance.readAndVerifyWithPacePolling(
+      clientId: clientId,
+      validationUri: validationUri,
+      validationId: validationId,
+      can: can,
+    );
+  }
 }

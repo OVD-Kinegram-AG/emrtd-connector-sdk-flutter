@@ -95,7 +95,8 @@ class EmrtdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             )
 
             "readAndVerifyWithCan",
-            "readAndVerifyWithPace" -> onReadAndVerify(
+            "readAndVerifyWithPace",
+            "readAndVerifyWithPacePolling" -> onReadAndVerify(
                 call,
                 result,
                 mapOf(EmrtdConnectorActivity.CAN to "can")

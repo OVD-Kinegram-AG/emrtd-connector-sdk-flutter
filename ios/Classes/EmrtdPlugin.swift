@@ -32,6 +32,12 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
         return
       }
       handlePACERequest(arguments: arguments, result: result)
+    case "readAndVerifyWithPacePolling":
+      guard let arguments = call.arguments as? [String: Any] else {
+        result(FlutterError(code: "ARGUMENT_ERROR", message: "Arguments missing or invalid", details: nil))
+        return
+      }
+      handlePACEPollingRequest(arguments: arguments, result: result)
 
     default:
       result(FlutterMethodNotImplemented)
@@ -90,6 +96,22 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
     presentConnector(
       configuration: configuration,
       accessMode: .pace(can: canKey, documentType: documentType, issuingCountry: issuingCountry),
+      result: result
+    )
+  }
+
+  private func handlePACEPollingRequest(arguments: [String: Any], result: @escaping FlutterResult) {
+    guard
+      let configuration = parseConfiguration(arguments: arguments),
+      let can = arguments["can"] as? String
+    else {
+      result(FlutterError(code: "ARGUMENT_MISSING", message: "Missing PACE polling parameters", details: nil))
+      return
+    }
+
+    presentConnector(
+      configuration: configuration,
+      accessMode: .pacePolling(can: can),
       result: result
     )
   }

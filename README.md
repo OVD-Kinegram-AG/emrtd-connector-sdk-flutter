@@ -66,14 +66,28 @@ to communicate with the eMRTD through a secure WebSocket connection.
      can: '123456',
    );
 
-   // Use PACE polling for ID cards that require it.
+   // Automatically (and only) use PACE polling for ID cards that
+   // require it, such as the French and Omani ID cards.
    final paceResult = await _emrtd.readAndVerifyWithPace(
      clientId: 'your_client_id',
      validationUri: 'wss://docval.kurzdigital.com/ws2/validate',
      validationId: 'unique-session-id',
      canKey: '123456',
      documentType: 'ID',
-     issuingCountry: 'D',
+     issuingCountry: 'FRA',
+   );
+
+   // Alternatively, always use PACE polling.
+   //
+   // IMPORTANT:
+   // PACE polling is only available (and required) on iOS 16 and later.
+   // PACE polling cannot detect standard passports - only use it when you
+   // know the document requires it.
+   final paceResult = await _emrtd.readAndVerifyWithPacePolling(
+     clientId: 'your_client_id',
+     validationUri: 'wss://docval.kurzdigital.com/ws2/validate',
+     validationId: 'unique-session-id',
+     canKey: '123456',
    );
    ```
 

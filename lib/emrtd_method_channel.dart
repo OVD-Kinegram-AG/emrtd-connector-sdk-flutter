@@ -64,4 +64,21 @@ class MethodChannelEmrtd extends EmrtdPlatform {
     });
     return result;
   }
+
+  @override
+  Future<String?> readAndVerifyWithPacePolling({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) async {
+    final result =
+        await methodChannel.invokeMethod<String>('readAndVerifyWithPacePolling', {
+      'clientId': clientId,
+      'validationUri': validationUri,
+      'validationId': validationId,
+      'can': can,
+    });
+    return result;
+  }
 }

@@ -40,6 +40,16 @@ class MockEmrtdPlatform
   }) async {
     return 'pace-result';
   }
+
+  @override
+  Future<String?> readAndVerifyWithPacePolling({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) async {
+    return 'pace-polling-result';
+  }
 }
 
 void main() {
@@ -100,5 +110,20 @@ void main() {
     );
 
     expect(result, 'pace-result');
+  });
+
+  test('readAndVerifyWithPacePolling delegates to platform implementation', () async {
+    final emrtdPlugin = Emrtd();
+    final fakePlatform = MockEmrtdPlatform();
+    EmrtdPlatform.instance = fakePlatform;
+
+    final result = await emrtdPlugin.readAndVerifyWithPacePolling(
+      clientId: 'client',
+      validationUri: 'uri',
+      validationId: 'validation',
+      can: '123456',
+    );
+
+    expect(result, 'pace-polling-result');
   });
 }

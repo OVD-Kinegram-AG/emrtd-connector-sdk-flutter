@@ -50,4 +50,15 @@ abstract class EmrtdPlatform extends PlatformInterface {
       'readAndVerifyWithPace() has not been implemented.',
     );
   }
+
+  Future<String?> readAndVerifyWithPacePolling({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String can,
+  }) {
+    throw UnimplementedError(
+      'readAndVerifyWithPacePolling() has not been implemented.',
+    );
+  }
 }

@@ -11,6 +11,7 @@ enum ConnectorAccessMode {
   case mrz(documentNumber: String, dateOfBirth: String, dateOfExpiry: String)
   case can(can: String)
   case pace(can: String, documentType: String, issuingCountry: String)
+  case pacePolling(can: String)
 }
 
 enum ConnectorFlowError: LocalizedError, Equatable {
@@ -90,6 +91,11 @@ final class ConnectorFlow {
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .uppercased()
         )
+      case let .pacePolling(can):
+        validationResult = try await connector.validate(
+          with: CANKey(can: normalizeCan(can)),
+          usePACEPolling: true
+        )
       }
 
       try finish(with: validationResult)
@@ -112,7 +118,7 @@ final class ConnectorFlow {
         birthDateyyMMdd: try normalizeDateInput(dateOfBirth, field: "date of birth"),
         expiryDateyyMMdd: try normalizeDateInput(dateOfExpiry, field: "date of expiry")
       )
-    case .pace:
+    case .pace, .pacePolling:
       fatalError("PACE access mode does not use an AccessKey")
     }
   }
