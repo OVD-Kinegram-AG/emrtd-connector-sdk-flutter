@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.6
+* Support PACE polling on iOS 16+
+
 ## 0.0.5
 * Update eMRTD connector
 

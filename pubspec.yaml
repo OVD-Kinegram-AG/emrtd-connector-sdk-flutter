@@ -1,6 +1,6 @@
 name: emrtd
 description: "Read and verify electronic passports and ID cards."
-version: 0.0.5
+version: 0.0.6
 homepage: https://kinegram.digital/mobile-chip-sdk/emrtd-connector/
 repository: https://github.com/OVD-Kinegram-AG/emrtd-connector-sdk-flutter
 issue_tracker: https://github.com/OVD-Kinegram-AG/emrtd-connector-sdk-flutter/issues
