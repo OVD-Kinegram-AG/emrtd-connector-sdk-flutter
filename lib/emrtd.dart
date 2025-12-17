@@ -32,4 +32,22 @@ class Emrtd {
       can: can,
     );
   }
+
+  Future<String?> readAndVerifyWithPace({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String canKey,
+    required String documentType,
+    required String issuingCountry,
+  }) {
+    return EmrtdPlatform.instance.readAndVerifyWithPace(
+      clientId: clientId,
+      validationUri: validationUri,
+      validationId: validationId,
+      canKey: canKey,
+      documentType: documentType,
+      issuingCountry: issuingCountry,
+    );
+  }
 }

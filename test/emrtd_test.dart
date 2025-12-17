@@ -28,6 +28,18 @@ class MockEmrtdPlatform
   }) async {
     return 'can-result';
   }
+
+  @override
+  Future<String?> readAndVerifyWithPace({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String canKey,
+    required String documentType,
+    required String issuingCountry,
+  }) async {
+    return 'pace-result';
+  }
 }
 
 void main() {
@@ -71,5 +83,22 @@ void main() {
     );
 
     expect(result, 'can-result');
+  });
+
+  test('readAndVerifyWithPace delegates to platform implementation', () async {
+    final emrtdPlugin = Emrtd();
+    final fakePlatform = MockEmrtdPlatform();
+    EmrtdPlatform.instance = fakePlatform;
+
+    final result = await emrtdPlugin.readAndVerifyWithPace(
+      clientId: 'client',
+      validationUri: 'uri',
+      validationId: 'validation',
+      canKey: '123456',
+      documentType: 'ID',
+      issuingCountry: 'D',
+    );
+
+    expect(result, 'pace-result');
   });
 }

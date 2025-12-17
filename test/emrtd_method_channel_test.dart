@@ -64,4 +64,27 @@ void main() {
       'can': '123456',
     });
   });
+
+  test('readAndVerifyWithPace uses the method channel', () async {
+    final result = await platform.readAndVerifyWithPace(
+      clientId: 'client',
+      validationUri: 'uri',
+      validationId: 'id',
+      canKey: '123456',
+      documentType: 'ID',
+      issuingCountry: 'D',
+    );
+
+    expect(result, 'mock-result');
+    expect(log, hasLength(1));
+    expect(log.single.method, 'readAndVerifyWithPace');
+    expect(log.single.arguments, {
+      'clientId': 'client',
+      'validationUri': 'uri',
+      'validationId': 'id',
+      'canKey': '123456',
+      'documentType': 'ID',
+      'issuingCountry': 'D',
+    });
+  });
 }

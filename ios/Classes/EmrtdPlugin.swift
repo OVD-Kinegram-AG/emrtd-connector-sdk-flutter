@@ -26,6 +26,12 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
         return
       }
       handleCANRequest(arguments: arguments, result: result)
+    case "readAndVerifyWithPace":
+      guard let arguments = call.arguments as? [String: Any] else {
+        result(FlutterError(code: "ARGUMENT_ERROR", message: "Arguments missing or invalid", details: nil))
+        return
+      }
+      handlePACERequest(arguments: arguments, result: result)
 
     default:
       result(FlutterMethodNotImplemented)
@@ -66,6 +72,24 @@ public class EmrtdPlugin: NSObject, FlutterPlugin {
     presentConnector(
       configuration: configuration,
       accessMode: .can(can: can),
+      result: result
+    )
+  }
+
+  private func handlePACERequest(arguments: [String: Any], result: @escaping FlutterResult) {
+    guard
+      let configuration = parseConfiguration(arguments: arguments),
+      let canKey = arguments["canKey"] as? String,
+      let documentType = arguments["documentType"] as? String,
+      let issuingCountry = arguments["issuingCountry"] as? String
+    else {
+      result(FlutterError(code: "ARGUMENT_MISSING", message: "Missing PACE parameters", details: nil))
+      return
+    }
+
+    presentConnector(
+      configuration: configuration,
+      accessMode: .pace(can: canKey, documentType: documentType, issuingCountry: issuingCountry),
       result: result
     )
   }

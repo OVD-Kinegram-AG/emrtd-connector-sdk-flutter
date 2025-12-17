@@ -10,6 +10,7 @@ struct ConnectorConfiguration {
 enum ConnectorAccessMode {
   case mrz(documentNumber: String, dateOfBirth: String, dateOfExpiry: String)
   case can(can: String)
+  case pace(can: String, documentType: String, issuingCountry: String)
 }
 
 enum ConnectorFlowError: LocalizedError, Equatable {
@@ -73,8 +74,24 @@ final class ConnectorFlow {
     connector.delegate = self
 
     do {
-      let accessKey = try buildAccessKey(for: accessMode)
-      let validationResult = try await connector.validate(with: accessKey)
+      let validationResult: ValidationResult
+
+      switch accessMode {
+      case .mrz, .can:
+        let accessKey = try buildAccessKey(for: accessMode)
+        validationResult = try await connector.validate(with: accessKey)
+      case let .pace(can, documentType, issuingCountry):
+        validationResult = try await connector.validate(
+          with: CANKey(can: normalizeCan(can)),
+          documentType: DocumentKind.fromMRZDocumentCode(
+            documentType.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+          ),
+          issuingCountry: issuingCountry
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        )
+      }
+
       try finish(with: validationResult)
     } catch is CancellationError {
       finish(with: .failure(ConnectorFlowError.cancelled))
@@ -86,10 +103,7 @@ final class ConnectorFlow {
   private func buildAccessKey(for mode: ConnectorAccessMode) throws -> AccessKey {
     switch mode {
     case .can(let can):
-      let digitsOnly = can.trimmingCharacters(in: .whitespacesAndNewlines)
-        .components(separatedBy: CharacterSet.decimalDigits.inverted)
-        .joined()
-      return CANKey(can: digitsOnly)
+      return CANKey(can: normalizeCan(can))
     case let .mrz(documentNumber, dateOfBirth, dateOfExpiry):
       return try MRZKey(
         documentNumber: documentNumber
@@ -98,7 +112,15 @@ final class ConnectorFlow {
         birthDateyyMMdd: try normalizeDateInput(dateOfBirth, field: "date of birth"),
         expiryDateyyMMdd: try normalizeDateInput(dateOfExpiry, field: "date of expiry")
       )
+    case .pace:
+      fatalError("PACE access mode does not use an AccessKey")
     }
+  }
+
+  private func normalizeCan(_ can: String) -> String {
+    can.trimmingCharacters(in: .whitespacesAndNewlines)
+      .components(separatedBy: CharacterSet.decimalDigits.inverted)
+      .joined()
   }
 
   private func normalizeDateInput(_ value: String, field: String) throws -> String {

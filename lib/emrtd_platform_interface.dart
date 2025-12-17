@@ -37,4 +37,17 @@ abstract class EmrtdPlatform extends PlatformInterface {
       'readAndVerifyWithCan() has not been implemented.',
     );
   }
+
+  Future<String?> readAndVerifyWithPace({
+    required String clientId,
+    required String validationUri,
+    required String validationId,
+    required String canKey,
+    required String documentType,
+    required String issuingCountry,
+  }) {
+    throw UnimplementedError(
+      'readAndVerifyWithPace() has not been implemented.',
+    );
+  }
 }

@@ -65,6 +65,16 @@ to communicate with the eMRTD through a secure WebSocket connection.
      validationId: 'unique-session-id',
      can: '123456',
    );
+
+   // Use PACE polling for ID cards that require it.
+   final paceResult = await _emrtd.readAndVerifyWithPace(
+     clientId: 'your_client_id',
+     validationUri: 'wss://docval.kurzdigital.com/ws2/validate',
+     validationId: 'unique-session-id',
+     canKey: '123456',
+     documentType: 'ID',
+     issuingCountry: 'D',
+   );
    ```
 
 The `readAndVerify…` calls initiate an NFC session, read the eMRTD chip with
