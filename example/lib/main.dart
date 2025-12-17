@@ -24,21 +24,27 @@ class _MyAppState extends State<MyApp> {
   static const _dateOfBirthKey = 'date_of_birth';
   static const _dateOfExpiryKey = 'date_of_expiry';
   static const _canKey = 'can';
+  static const _documentTypeKey = 'document_type';
+  static const _issuingCountryKey = 'issuing_country';
   final Future<SharedPreferences> _prefsFuture =
       SharedPreferences.getInstance();
 
   final _mrzFormKey = GlobalKey<FormState>();
   final _canFormKey = GlobalKey<FormState>();
+  final _paceFormKey = GlobalKey<FormState>();
   final _documentNumberController = TextEditingController(text: 'C01X00000');
   final _dateOfBirthController = TextEditingController(text: '900101');
   final _dateOfExpiryController = TextEditingController(text: '300101');
   final _canController = TextEditingController(text: '123456');
+  final _documentTypeController = TextEditingController(text: 'ID');
+  final _issuingCountryController = TextEditingController(text: 'FRA');
 
   final _emrtdPlugin = Emrtd();
 
   String _result = 'Ready to read and verify.';
   bool _isMrzLoading = false;
   bool _isCanLoading = false;
+  bool _isPaceLoading = false;
 
   @override
   void initState() {
@@ -55,6 +61,12 @@ class _MyAppState extends State<MyApp> {
     _canController.addListener(
       () => _persistValue(_canKey, _canController.text),
     );
+    _documentTypeController.addListener(
+      () => _persistValue(_documentTypeKey, _documentTypeController.text),
+    );
+    _issuingCountryController.addListener(
+      () => _persistValue(_issuingCountryKey, _issuingCountryController.text),
+    );
     _loadStoredValues();
   }
 
@@ -64,6 +76,8 @@ class _MyAppState extends State<MyApp> {
     _dateOfBirthController.dispose();
     _dateOfExpiryController.dispose();
     _canController.dispose();
+    _documentTypeController.dispose();
+    _issuingCountryController.dispose();
     super.dispose();
   }
 
@@ -73,6 +87,8 @@ class _MyAppState extends State<MyApp> {
     final storedDateOfBirth = prefs.getString(_dateOfBirthKey);
     final storedDateOfExpiry = prefs.getString(_dateOfExpiryKey);
     final storedCan = prefs.getString(_canKey);
+    final storedDocumentType = prefs.getString(_documentTypeKey);
+    final storedIssuingCountry = prefs.getString(_issuingCountryKey);
 
     if (storedDocumentNumber?.isNotEmpty ?? false) {
       _documentNumberController.text = storedDocumentNumber!;
@@ -85,6 +101,12 @@ class _MyAppState extends State<MyApp> {
     }
     if (storedCan?.isNotEmpty ?? false) {
       _canController.text = storedCan!;
+    }
+    if (storedDocumentType?.isNotEmpty ?? false) {
+      _documentTypeController.text = storedDocumentType!;
+    }
+    if (storedIssuingCountry?.isNotEmpty ?? false) {
+      _issuingCountryController.text = storedIssuingCountry!;
     }
   }
 
@@ -170,6 +192,48 @@ class _MyAppState extends State<MyApp> {
     } finally {
       _setStateWhenMounted(() {
         _isCanLoading = false;
+      });
+    }
+  }
+
+  Future<void> _readAndVerifyWithPace() async {
+    final isPaceValid = _paceFormKey.currentState?.validate() ?? false;
+
+    if (!isPaceValid) {
+      return;
+    }
+
+    _setStateWhenMounted(() {
+      _isPaceLoading = true;
+      _result = 'Reading PACE-enabled document…';
+    });
+
+    try {
+      final result =
+          await _emrtdPlugin.readAndVerifyWithPace(
+            clientId: _clientId,
+            validationUri: _validationUri,
+            validationId: _randomId(),
+            canKey: _canController.text.trim(),
+            documentType: _documentTypeController.text.trim(),
+            issuingCountry: _issuingCountryController.text.trim(),
+          ) ??
+          'No result';
+
+      _setStateWhenMounted(() {
+        _result = result;
+      });
+    } on PlatformException catch (e) {
+      _setStateWhenMounted(() {
+        _result = 'Platform error: ${e.message ?? e.code}';
+      });
+    } catch (e) {
+      _setStateWhenMounted(() {
+        _result = 'Unexpected error: $e';
+      });
+    } finally {
+      _setStateWhenMounted(() {
+        _isPaceLoading = false;
       });
     }
   }
@@ -274,6 +338,57 @@ class _MyAppState extends State<MyApp> {
                   const SizedBox(height: 16),
                   _buildSectionCard(
                     context,
+                    title: 'Read PACE-enabled document',
+                    child: Form(
+                      key: _paceFormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildTextField(
+                            controller: _canController,
+                            label: 'CAN (Card Access Number)',
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                          _buildTextField(
+                            controller: _documentTypeController,
+                            label: 'Document Type (e.g. ID)',
+                            textCapitalization: TextCapitalization.characters,
+                          ),
+                          _buildTextField(
+                            controller: _issuingCountryController,
+                            label: 'Issuing Country (ISO alpha-3)',
+                            textCapitalization: TextCapitalization.characters,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: _isPaceLoading
+                                ? null
+                                : () => _readAndVerifyWithPace(),
+                            icon: _isPaceLoading
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.nfc_rounded),
+                            label: Text(
+                              _isPaceLoading
+                                  ? 'Processing…'
+                                  : 'Read & Verify with PACE',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSectionCard(
+                    context,
                     title: 'Result',
                     elevation: 2,
                     child: Text(_result),
@@ -330,6 +445,7 @@ class _MyAppState extends State<MyApp> {
     TextInputType? keyboardType,
     TextCapitalization textCapitalization = TextCapitalization.none,
     List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -339,8 +455,9 @@ class _MyAppState extends State<MyApp> {
         textCapitalization: textCapitalization,
         inputFormatters: inputFormatters,
         decoration: InputDecoration(labelText: label),
-        validator: (value) =>
-            value == null || value.trim().isEmpty ? 'Required' : null,
+        validator: validator ??
+            (value) =>
+                value == null || value.trim().isEmpty ? 'Required' : null,
       ),
     );
   }
