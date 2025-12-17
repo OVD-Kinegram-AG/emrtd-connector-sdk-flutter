@@ -16,7 +16,7 @@ electronic passports / id cards (a.ka. eMRTDs).
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'KinegramEmrtdConnector', '~> 2.9.1'
+  s.dependency 'KinegramEmrtdConnector', '~> 2.10.5'
   s.platform = :ios, '15.0'
   s.ios.deployment_target = '15.0'
 
